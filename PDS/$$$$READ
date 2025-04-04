@@ -1,0 +1,284 @@
+Notice --
+
+  Due to the difficulty of testing a new version of COPYMODS with
+  all its many options (in combination), I am including the previous
+  version of COPYMODS (Level 056 as member COPYMO56) as a fallback.
+
+  Level 083 is the currently distributed version of COPYMODS.
+
+  Recent changes:
+
+  LEVEL 053 - OPTION TO TURN OFF 3490E OR IDRC INDICATORS
+              IN THE TAPE LABELS.  ALSO ON INPUT ERROR,
+              CLOSE ALL THE FILES BEFORE ABEND 069.
+
+  LEVEL 054 - HEX PRINT FIRST 132 BYTES OF FIRST N
+              RECORDS OF EACH FILE.  IF KEYWORD HEXPRT
+              IS CODED, A DEFAULT OF 4 BLOCKS FROM EACH
+              TAPE FILE WILL BE DUMPED (THE WAY TAPESCAN
+              DOES IT).  YOU CAN OVERRIDE THIS VALUE BY
+              CODING PRINTRCDS=nnn IN SYSIN, STARTING IN
+              COLUMN 1.  RECORDS ARE DUMPED INTO THE
+              SYSPRINT DATASET.
+
+  LEVEL 055 - MAKE DEFAULT NUMBER OF RECORDS TO HEX PRINT,
+              A GLOBAL ASSEMBLER VARIABLE, &HEXDFLA.
+              DISTRIBUTION VALUE IS SET TO 4, AS ABOVE.
+
+  LEVEL 056 - TAKE THE TRANSLATE TABLES FOR HEX PRINT OUT
+              OF THE MAIN CSECT.
+
+  LEVEL 057 - USE THE PARMCHEK SEPARATED PARMSCAN ROUTINE
+              INSTEAD OF THE PARMCHK SUBROUTINE FOR
+              SCANNING PARM AND SYSIN CARDS.  THIS ALSO
+              ALLOWS THE USE OF THE OPTIONAL DDNAME OF
+              //PARMREPT TO LOOK AT THE ACTION OF THE
+              PARM SCAN IN DETAIL.
+
+  LEVEL 058 - UPON ERROR WITH ONE OF THE OUTPUT TAPES,
+              REPORT NUMBER OF FILES CORRECTLY COPIED,
+              NUMBER OF BLOCKS COPIED FROM LAST FILE,
+              AND TOTAL BYTE COUNT COPIED TO THAT OUTPUT
+              TAPE.  THIS IS A REMEDY FOR SHORT OUTPUT
+              TAPES--TO FIGURE OUT HOW SHORT....
+
+  LEVEL 059 - DOCUMENTATION CHANGES TO MAKE ALL THE
+              FEATURE DESCRIPTIONS AS CONSISTENT AS
+              POSSIBLE.
+
+              FIX OUTPUT ERROR MESSAGES TO REFLECT PROPER
+              UNIT ADDRESS AND VOLSER OF THE OUTPUT UNIT
+              IN ERROR.
+
+  LEVEL 060 - NEW PARM UNEXWTO, AND NOUNEXWT (TO TURN IT
+              OFF).  THIS WILL SEND A WTOR TO THE OPERATOR
+              WHEN ONE OF THE TAPES IS TOO SHORT.  (NOW
+              IT IS THE DEFAULT, AS IN THE OLD DAYS.)
+
+  LEVEL 061 - FIX BUG. IF SYSIN IS PRESENT BUT NOT CODED
+              EXPLICITLY IN THE PARMS, THE OPTION WAS
+              MARKED AS NOSYSIN IN THE OPTIONS DISPLAY.
+
+              FIX BUG. AFTER LEVEL 057, PARMCHEK WAS NOT
+              CALLED PROPERLY, AND THE ORIGINAL COPYMODS
+              PARMS WERE LOST.  PRESERVE ORIGINAL PARMS
+              IN PARMSTRT FIELD WHICH IS ACCESSIBLE TO
+              R2, WHEN IT IS PASSED TO THE PARMCHEK
+              PROGRAM.
+
+              UPDATE PROGRAM DOCUMENTATION TO REFLECT THE
+              CHANGES IN PROGRAM STRUCTURE AND DESIGN.
+
+  LEVEL 062 - FIX DOC A BIT MORE.
+              10 PARM BITS INSTEAD OF 5, in COPYMODS and PARMCHEK.
+              CHANGES TO COPYMODS, COPYMOPT, PARMCHEK.
+
+  LEVEL 063 - RC = 16 IF AT LEAST ONE SHORT OUTPUT TAPE
+              WAS ENCOUNTERED, AND THE WTOR WAS ISSUED.
+              RC = 8 IF ONE ERROR IN THE OUTPUT TAPES
+              OCCURRED, WITHOUT ISSUING A WTOR.
+
+  LEVEL 064 - Return Code adjustments.
+
+  LEVEL 065 - REWIND Tapes before initting in INITVOLS
+              processing.
+              HEXPRT now works for INITVOLS.
+              HEXPRT now prints the external labels in a
+              LABADDIN operation.
+              TAPEOWNER= is now honored for an INITVOLS
+              operation (this fixes a bug).
+              Number for FILELIMIT=nnn is now filled in,
+              in the message, when the EBCDIC value
+              exists.
+              Fix another bug--Tape Owner not altered--
+              now use the value of tape owner passed from
+              the PARMCHEK program.
+
+  LEVEL 066 - Cosmetic changes.
+
+  LEVEL 067 - Introduce ability to INIT ASCII tapes
+              (ISO/ANSI) Level 3 or Level 4, with the
+              INASC3 or INASC4 keywords.  You can control
+              if the HEXPRT is interpreted in EBCDIC or
+              ASCII using the ASCII or the EBCDIC
+              keywords.  For an ASCII tape init, ASCII
+              print interpretation is turned on by
+              default.  If you are initting an ASCII
+              tape using the INASCII keyword, a Level 3
+              ASCII tape will be created.
+
+              ASCII Level 4 is only supported in MVS at
+              the OS/390 2.4 level and higher.
+
+  LEVEL 068 - Split off label checking routine into a
+              separate program, LABELCHK, which is
+              assembled with COPYMODS together.
+
+  LEVEL 069 - More ASCII label detection support.
+              LABLDUMP now works for ASCII tapes.  The
+              control cards in the LABLDUMP DD name have
+              been translated into ASCII, the same as the
+              labels and the data.  PARM=STRIP now works
+              for ASCII tapes.
+
+              Fixed a bug where OUTVOLALL didn't work
+              for volumes other than VOLUME1.
+
+  LEVEL 070 - More ASCII label detection support.
+              LABADDIN works for ASCII tapes now.
+              BLKCNT option fixed to convert corrected
+              block counts to ASCII when necessary.
+              EOVTOEOF now works for ASCII and IBM tapes,
+              because a call to LABELCHK now returns the
+              altered copy of INAREA to the main program.
+              A parm of EOV2 now requires a space after
+              it, so as not to interfere with EOV2EOF.
+
+  LEVEL 071 - PRINT LABELS support for ASCII tapes.
+
+              LBI support for XXX2 print of label
+              contents.  Big blocksizes are printed
+              in the XXX2 print message if they exist
+              in the labels.  This is for IBM labels.
+
+              Support 14-character tape owner for
+              ANSI/ISO (ASCII) tapes.
+
+              Other cosmetic changes and many bug fixes.
+
+  LEVEL 072 - Separate all label print operations into a
+              call to a separate CSECT called PRINTLBL.
+              Now there is a unified label print routine
+              for both EXTLBLIN and INAREA label input.
+
+  LEVEL 073 - Separate messages into their own CSECT.
+              Address with PTMS macro, and special setup.
+              Assembler instructions which access fields
+              in the MSGCSECT CSECT are created with the
+              new MVFMS macro.
+
+  LEVEL 074 - Fix LTM service and reporting.
+
+  LEVEL 075 - Implement SECOFF (security indicators in
+              labels turned off in the copied tapes).
+              Involves VOL1 (byte 11) for ASCII tapes.
+              XXX1 (byte 54) which is turned to C'0' for
+              EBCDIC (IBM) tapes, and which is turned to
+              ASCII space (X'20') for ASCII tapes.
+
+  LEVEL 076 - Implement FOOTAGE keyword to measure each
+              tape file approximately, giving a 6250 bpi
+              footage calculation.  This code originally
+              came from the SS0104 tape mapping program
+              from the Florida Power Corporation.
+              Cumulative footages for the entire tape up
+              to the current file, are also displayed.
+
+              Introduced the FOOTDIAG keyword, to print
+              diagnostics in the footage calculation.
+              Most of the FOOTAGE workarea fields are
+              displayed.
+
+  LEVEL 077 - Save addressability space by replacing
+              multiple MVFMS invocations with ADRSMS and
+              DROPMS macros, to get addressability to
+              MSGCSECT, and keep it for a while.  Also
+              further reduced the program size by making
+              a PTMSN macro that doesn't re-do the
+              addressability that PTMS does.  This is for
+              putting in between a ADRSMS and a DROPMS.
+
+  LEVEL 078 - Add CODEDPRM option to report PARM options
+              before they were adjusted by COPYMODS.
+
+              There was no way to turn off the INITVOLS
+              option with a parm.  So I coded the NOINITVO
+              option, to turn off the INITVOLS option
+              bit.  So tape init will only be in effect
+              if INITVOLS is explicitly coded.  Report
+              NOINITVO in the options report, if this
+              option is set off.  Remember that coding
+              the INITVOLS keyword also turns on the
+              CHGVOL option, so that the JCL volser gets
+              propagated into the newly initiated tape.
+              Coding NOINITVO only turns off the INITVOLS
+              parm bit, and not the CHGVOL bit, as this
+              should be the proper way to do it.
+
+              If no //OUTn DD cards are coded in the JCL,
+              COPYMODS would have run through the WRITEs
+              without writing, and it would look like a
+              normal run.  The logical fix would be to
+              force READONLY on, and say in a message
+              that you have done so. (That's what I did.)
+
+  LEVEL 079   Add MINMAX option to report largest and
+              smallest block sizes for each file read.
+
+  LEVEL 080   Added RECSIZE option to report individual
+              size of tape blocks, one at a time.  This
+              option produces one record in SYSPRINT for
+              each tape data block because it is reporting
+              that block's size.  So this option should
+              not be a default since it makes a lot of
+              output.  Shows details of the MINMAX
+              display, so RECSIZE implies MINMAX.  If
+              RECSIZE is coded, MINMAX is switched on.
+
+              Got rid of "SBG MM/YY" type comments.
+
+  LEVEL 081   Fix problem in PARM=STRIP code where a
+              label image in the middle of tape data was
+              stripped off.
+
+  LEVEL 082   Fix problem in PARM=STRIP code where an
+              80-byte tape block would cause no tape mark
+              to be written at the end of the current
+              file.  Made STRIP diagnostics a separate
+              parm called DGSTRI and NODGSTRI.
+
+  LEVEL 083   Fix carriage control column for STRIP
+              diagnostic messages.  Option DGSTRI.
+
+  LEVEL 084   Added option SHOOVL, which displays
+              the first 80 bytes of the first block of
+              each output tape, to determine if it is
+              a VOL1 label, and what kind of VOL1 label.
+              Added option KEEPVOL, KEEPVL.  This option
+              looks at the VOL1 label of the output tape,
+              and keeps it in the copied tape, if the
+              input tape VOL1 label is compatible with it.
+              The principal reason for having this, is if
+              a scratch tape is the copied tape, you do
+              not necessarily know its volser in advance.
+
+  LEVEL 085   Size constraint relief.  Already ran out of
+              6 base registers.  GETMAIN a workarea and
+              put extra stuff there, addressable with R13.
+
+              Allow READ and SHOOVL at the same time,
+              so that you can do a "dry run" without tape
+              copying.  Now you can see what is on the
+              output tapes you have mounted, without
+              overlaying them as soon as you saw what
+              used to be there.
+
+  LEVEL 086   Revamp the MSGCSECT processing to handle
+              messages of any length, not only 133.
+              Also allow insertion of any print control
+              characters via the macro, and not in the
+              message itself.  Redo macros PTMS and PTMSN.
+
+  LEVEL 087   PROPVL implementation started, but not
+              complete.
+
+  LEVEL 088   Fix bug that when DGSTRI (diagnostics for
+              the STRIP option) is in effect, while the
+              READ only option is also on, then the
+              "tape mark has been read" messages are on,
+              but the "tape mark has been written"
+              messages have been turned off.
+
+
+      Sam Golob     sbgolob@cbttape.org
+
